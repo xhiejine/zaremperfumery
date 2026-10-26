@@ -6,7 +6,7 @@ compatibility_date = "2025-01-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "zarem-db"
-database_id = "PASTE_YOUR_D1_ID_HERE"
+database_id = "ded1b48c-ce1d-40ee-93c2-9f269f503818"
 
 # Create an R2 bucket named zarem-images first (Storage & Databases > R2)
 [[r2_buckets]]
