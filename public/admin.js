@@ -7,10 +7,11 @@ const TABS=[["dash","Dashboard"],["orders","Orders"],["enq","Wholesale"],["prod"
 async function api(p,m="GET",b){const r=await fetch("/api/admin/"+p,{method:m,headers:{authorization:"Bearer "+T,"content-type":"application/json"},body:b?JSON.stringify(b):undefined});if(r.status==401){out();throw 0}const d=await r.json();if(!r.ok){alert(d.error);throw 0}return d}
 const opts=(a,v)=>a.map(x=>`<option value="${E(x)}" ${x===v?"selected":""}>${U(x)}</option>`).join("");
 $("#go").onclick=async()=>{const m=$("#le");m.textContent="Logging in...";try{const r=await fetch("/api/admin/login",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({email:$("#em").value.trim(),password:$("#pw").value.trim()})}),d=await r.json().catch(()=>({}));
- if(!r.ok){m.textContent=d.error||"Login failed (error "+r.status+")";return}T=d.token;sessionStorage.setItem("zt",T);m.textContent="";init()}catch(e){m.textContent="Could not reach the server. Check your connection."}};
+ if(!r.ok){m.textContent=d.error||"Login failed (error "+r.status+")";return}T=d.token;sessionStorage.setItem("zt",T);m.textContent="Logged in. Opening dashboard...";init()}catch(e){m.textContent="Could not reach the server. Check your connection."}};
 $("#pw").addEventListener("keydown",e=>{if(e.key==="Enter")$("#go").click()});$("#em").addEventListener("keydown",e=>{if(e.key==="Enter")$("#pw").focus()});
+async function me(){const r=await fetch("/api/admin/me",{headers:{authorization:"Bearer "+T}}),d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||("server returned "+r.status));return d}
 function out(){T="";sessionStorage.removeItem("zt");$("#login").hidden=false;$("#app").hidden=true}
-async function init(){if(!T)return;try{ME=await api("me")}catch{return}$("#login").hidden=true;$("#app").hidden=false;const ok=k=>NEEDP[k]==="owner"?ME.owner:ME.perms.includes(NEEDP[k]),tabs=TABS.filter(([k])=>ok(k));
+async function init(){if(!T)return;try{ME=await me()}catch(e){$("#le").textContent="Could not open dashboard: "+e.message;T="";sessionStorage.removeItem("zt");return}$("#login").hidden=true;$("#app").hidden=false;const ok=k=>NEEDP[k]==="owner"?ME.owner:ME.perms.includes(NEEDP[k]),tabs=TABS.filter(([k])=>ok(k));
  $("#nav").innerHTML=`<b>Zaremperfumery</b><span class="mut">${E(ME.name)}</span>`+tabs.map(([k,l])=>`<button data-t="${k}">${l}</button>`).join("")+'<button id="lo">Log out</button>';$("#lo").onclick=out;tabs.length?show(tabs[0][0]):$("#v").innerHTML="<p>Your account has no permissions yet. Ask the owner.</p>"}
 $("#nav").onclick=e=>{const t=e.target.dataset.t;if(t)show(t)};
 const dlg=$("#dlg");dlg.onclick=e=>{if(e.target===dlg)dlg.close()};
@@ -33,4 +34,3 @@ async set(){const s=await api("settings");$("#v").innerHTML=`<h2>Settings</h2><d
 const up=(i,b)=>api("orders/"+i,"PATCH",b).then(()=>show("orders"));
 const uv=i=>api("variants/"+i,"PATCH",{price_naira:$("#a"+i).value,stock:$("#b"+i).value}).then(()=>alert("Saved"));
 const dv=i=>confirm("Delete this size?")&&api("variants/"+i,"DELETE").then(()=>show("prod"));
-const conv=i=>confirm("Create an order record from this enquiry?")&&api(`enquiries/${i}/convert`,"POST").then(r=>{alert("Order "+r.ref+" created. Add details under Orders.");show("enq")});
