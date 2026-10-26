@@ -1,0 +1,15 @@
+CREATE TABLE products(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,category TEXT NOT NULL,type TEXT,gender TEXT,description TEXT,notes TEXT,image_url TEXT,images TEXT,published INTEGER DEFAULT 1,is_new INTEGER DEFAULT 0,is_featured INTEGER DEFAULT 0,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE variants(id INTEGER PRIMARY KEY AUTOINCREMENT,product_id INTEGER NOT NULL REFERENCES products(id),size TEXT,price_kobo INTEGER CHECK(price_kobo IS NULL OR price_kobo>=0),stock INTEGER CHECK(stock IS NULL OR stock>=0));
+CREATE TABLE customers(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,email TEXT UNIQUE NOT NULL,phone TEXT,pw TEXT NOT NULL,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE orders(id INTEGER PRIMARY KEY AUTOINCREMENT,ref TEXT UNIQUE NOT NULL,customer_id INTEGER,name TEXT,phone TEXT,email TEXT,address TEXT,state TEXT,city TEXT,fulfilment TEXT,notes TEXT,payment_method TEXT,status TEXT DEFAULT 'pending_confirmation',payment_status TEXT DEFAULT 'unpaid',subtotal_kobo INTEGER,discount_kobo INTEGER DEFAULT 0,discount_code TEXT,delivery_fee_kobo INTEGER,internal_notes TEXT,stock_deducted INTEGER DEFAULT 0,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE order_items(id INTEGER PRIMARY KEY AUTOINCREMENT,order_id INTEGER NOT NULL REFERENCES orders(id),variant_id INTEGER,name TEXT,size TEXT,qty INTEGER,price_kobo INTEGER);
+CREATE TABLE payments(reference TEXT PRIMARY KEY,order_id INTEGER NOT NULL,amount_kobo INTEGER NOT NULL,status TEXT DEFAULT 'pending',created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE discounts(id INTEGER PRIMARY KEY AUTOINCREMENT,code TEXT UNIQUE NOT NULL,type TEXT CHECK(type IN('percent','fixed')),value INTEGER NOT NULL CHECK(value>0),min_kobo INTEGER DEFAULT 0,starts TEXT,ends TEXT,max_uses INTEGER,used INTEGER DEFAULT 0,category TEXT,active INTEGER DEFAULT 1);
+CREATE TABLE enquiries(id INTEGER PRIMARY KEY AUTOINCREMENT,ref TEXT UNIQUE NOT NULL,customer_id INTEGER,name TEXT,business TEXT,email TEXT,phone TEXT,location TEXT,categories TEXT,requested TEXT,contact_pref TEXT,notes TEXT,status TEXT DEFAULT 'new',quote_notes TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE subscribers(email TEXT PRIMARY KEY,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE stock_log(id INTEGER PRIMARY KEY AUTOINCREMENT,variant_id INTEGER,change INTEGER,reason TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE settings(k TEXT PRIMARY KEY,v TEXT);
+INSERT INTO settings VALUES('announcement','Perfume bottle clearance sale - message us on WhatsApp for what is available'),('bank_details','Bank details not set yet. Contact us on WhatsApp for payment instructions.');
+CREATE TABLE staff(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,email TEXT UNIQUE NOT NULL,pw TEXT NOT NULL,permissions TEXT DEFAULT '',active INTEGER DEFAULT 1,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE activity(id INTEGER PRIMARY KEY AUTOINCREMENT,who TEXT,action TEXT,detail TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE login_fail(id INTEGER PRIMARY KEY AUTOINCREMENT,k TEXT,ts TEXT DEFAULT CURRENT_TIMESTAMP);

@@ -1,0 +1,14 @@
+# Cloudflare PAGES configuration (GitHub deploy)
+name = "zaremperfumery"
+pages_build_output_dir = "public"
+compatibility_date = "2025-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "zarem-db"
+database_id = "PASTE_YOUR_D1_ID_HERE"
+
+# Create an R2 bucket named zarem-images first (Storage & Databases > R2)
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "zarem-images"

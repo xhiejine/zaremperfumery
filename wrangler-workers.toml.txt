@@ -1,0 +1,22 @@
+name = "zaremperfumery"
+main = "src/worker.js"
+compatibility_date = "2025-01-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
+not_found_handling = "404-page"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "zarem-db"
+database_id = "PASTE_ID_FROM_wrangler_d1_create"
+
+# Image uploads: create an R2 bucket named zarem-images first (Storage & Databases > R2)
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "zarem-images"
+
+[vars]
+# Optional: SITE_URL = "https://yourdomain.com"  (used for the Paystack return link)
